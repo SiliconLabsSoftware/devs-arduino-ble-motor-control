@@ -1,24 +1,144 @@
 # Silabs SimpleFOC motor control with BLE example
+This repository contains the example application to demonstrate the simpleFOC closed loop speed control operation with BLE communication. The application accepts BLE connection from a mobile phone and receives commands via Serial Profile Protocol (SPP).
 
-This repository contains the example application to demonstrate the simpleFOC closed loop speed control operation with BLE communication. The application accepts BLE connection from a mobile phone and receives commands via Serial Profile Protocol (SSP). The serial protocol is same what simpleFOC is using via the wired serial interface.
+## Hardware requirements
+* **Arduino Nano Matter (EFR32MG24)** [https://docs.arduino.cc/hardware/nano-matter/](https://docs.arduino.cc/hardware/nano-matter/) or **SparkFun Thing Plus Matter** [https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html](https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html)
+* **DRV8305 BoosterPack (BOOSTXL-DRV8305EVM)**
+* **BLDC Motor: DF45M024053 – A2**
+* USB cable for programming and serial monitor
 
-## Hardware
+## Hardware Setup
+A dedicated interface board set-up connecting the Motor - Power Stage - Nano Matter. Jump wires can be used as well to connect the boards.
 
-Currently two Arduino boards are supported:
+![hw_setup](resources/hw_setup.png)
 
- - *Arduino Nano Matter* (this is part of the Motor Control Demo Kit)
- - *SparkFun SparkFun Thing Plus Matter*
- 
-The I/O configuration is automatically set tho the used board at build time.
+Connect the Arduino Nano Matter board to the DRV8305EVM according to the board pin mapping (phase outputs, PWM inputs, and Hall sensor connections).
 
-## Build
+![MC Wiring](resources/nanoMatterMC_Wiring.png)
 
-To properly build the application the next Arduino software environment is required:
+### Wiring Table: Arduino Nano Matter to BOOSTXL-DRV8305 & BLDC Motor
 
- - *Silabs Arduino Core* v3.0.0 [download link](https://github.com/SiliconLabs/arduino/releases/tag/3.0.0)
- - *simpleFOC Arduino library* v2.3.6 (until the official v2.3.6 is not released you have to clone the development branch) [download link](https://github.com/simplefoc/Arduino-FOC/tree/dev)
- 
+This table describes the connections between the Arduino Nano Matter, the TI BOOSTXL-DRV8305 driver board, and a 3-phase BLDC motor with Hall sensors.
 
- 
- 
+| From (Nano Matter Pin) | To (DRV8305 BoosterPack Pin) | BLDC MOTOR | Function / Description | 
+| :--- | :--- | :--- | :---|
+| `3.3V` | `3V3` | HALL/ENC Supply*  | 3.3V Power the BoosterPack provides 3.3V through an LDO |
+| `GND` | `PowerSupply GND` | HALL/ENC sensor GND | Common Ground |
+| N/A | `PowerSupply 12V` | N/A | Power supply for power stage 4.4 to 45 V, consider motor power|
+| `A0`  | `ISENA` | N/A | Phase A current sense |
+| `A1`  | `ISENB` | N/A | Phase B current sense |
+| `A2`  | `ISENC` | N/A | Phase C current sense |
+| `A3`  | `VSENA` | N/A | Phase A Voltage sense (Optional, not mandatory to run examples) |
+| `A4`  | `VSENB` | N/A | Phase B Voltage sense (Optional, not mandatory to run examples) |
+| `A5`  | `VSENC` | N/A | Phase C Voltage sense (Optional, not mandatory to run examples)|
+| `A6`  | `VSENVPVDD`   | N/A | DC BUS Voltage sense (Optional, not mandatory to run examples)|
+| `D0` (MOSI1)  | `SDI` | N/A | DRV8035 SPI connection, configuration and status reading (Optional, not mandatory to run examples)|
+| `D1` (MISO1)  | `SDO` | N/A | DRV8035 SPI connection, configuration and status reading (Optional, not mandatory to run examples)|
+| `D2` (SCK1)   | `SCLK`| N/A | DRV8035 SPI clock, configuration and status reading (Optional, not mandatory to run examples)|
+| `D3` (SS1)    | `SCS` | N/A | DRV8035 SPI chip select, configuration and status reading (Optional, not mandatory to run examples)|
+| `D4`  | N/A | HALL A or Encoder A | Motor sensor connection (Hall configuration in examples) |
+| `D5`  | N/A | HALL B or Encoder B | Motor sensor connection (Hall configuration in examples) |
+| `D6`  | `PWMHA` | N/A | PWM Phase A High-Side Gate Signal |
+| `D7`  | `PWMLA` | N/A | PWM Phase A Low-Side Gate Signal |
+| `D8`  | `PWMHB` | N/A | PWM Phase B High-Side Gate Signal |
+| `D9`  | `PWMLB` | N/A | PWM Phase B Low-Side Gate Signal |
+| `D10` | `PWMHC` | N/A | PWM Phase C High-Side Gate Signal |
+| `D11` | `PWMLC` | N/A | PWM Phase C Low-Side Gate Signal |
+| `D12` | `ENGATE` | N/A | Enable DRV8305 gate driver |
+| `D13` | N/A | HALL C or Encoder Index | Motor sensor connection (Hall configuration in examples) |
+| N/A | `PHASE U` | `PHASE U` | Motor phase connection |
+| N/A | `PHASE V` | `PHASE V` | Motor phase connection |
+| N/A | `PHASE W` | `PHASE W` | Motor phase connection |
 
+**Important Notes:**
+*   **Power:** Ensure the DRV8305's `PVDD` and `GVDD` jumpers are correctly set for your motor's voltage. The power supply should be rated at least twice the motor’s nominal power. The BoosterPack can supply the Nano Matter if it is not connected to USB.
+* **Rotor sensor:** Some Encoder or Hall sensors might require 5V supply, make sure of proper level shifting if required. 
+*   **SPI:** The SPI connection (`nSCS`, `SPI_CLK`, `SPI_MOSI`, `SPI_MISO`) is used to configure the DRV8305 driver IC (e.g., set gain, fault parameters). It is optional for the examples. The examples are using the default gate driver configuration. Only needed if you wish to change the default gate driver configuration (e.g., dead time, fault parameters).
+
+---
+
+## Software Setup
+
+1. **Arduino IDE**
+
+   * Use Arduino IDE **2.3.4 or later**.
+   * [Download here](https://www.arduino.cc/en/software).
+
+2. **Silicon Labs Arduino Core**
+
+   * Open *Boards Manager* in Arduino IDE.
+   * Search for *Silicon Labs* and install the latest version (**2.3.0** or newer).
+   * If not found, add this URL under *Preferences → Additional Boards Manager URLs*:
+
+     ```
+     https://siliconlabs.github.io/arduino/package_arduinosilabs_index.json
+     ```
+
+3. **SimpleFOC**
+
+    * Use SimpleFOC **2.3.6 or later**
+      * *Note: At the time of writing the 2.3.6 version is not yet available. Use the development branch until the release. [Download development branch](https://github.com/simplefoc/Arduino-FOC/archive/refs/heads/dev.zip)*
+      * *Unzip the downloaded library and copy the library folder ("Arduino-FOC-dev" or similar) to the Arduino library folder. (Arduino/libraries)*
+      * *In this case the steps below are not needed.*
+    * Open *Library Manager* in Arduino IDE.
+    * Search and add *Simple FOC* library
+
+4. **Silabs BLE Stack**
+
+   * In Arduino IDE go to *"Tools/Protocol stack"* and select **BLE (Silabs)**
+
+5. **(Optional) SimpleFOC Studio or web viewer**
+
+   * For runtime tuning and monitoring.
+   * [Docs](https://docs.simplefoc.com/studio)
+   * [Enable Monitoring](https://docs.simplefoc.com/monitoring)
+
+---
+
+## Running the Examples
+
+1. Open the `.ino` file in Arduino IDE.
+2. Select your **Arduino Nano Matter** or **SparkFun Thing Plus Matter** board.
+3. Compile & upload.
+4. Open the Serial Monitor (115200 baud)
+5. (Optional) Connect with monitoring tools. 
+    1. Modification of the example code is necessary to enable monitoring feature. *(Note: Monitoring decreases the preformance)*
+    2. [Enable Monitoring](https://docs.simplefoc.com/monitoring)
+
+### Example Commands
+
+Send commands to control the motor:
+
+``` bash
+M50    # Run clockwise at 50 rad/s
+M-50   # Run counter-clockwise at 50 rad/s
+M0     # Stop motor
+```
+
+Command can be sent via the serial or the BLE interface. The command structure are the same on both interface.
+
+#### BLE Connection Setup
+Scan for BLE devices using **Simplicity Connect** application. In the list of detected devices, identify the one named in the format motor_xxyyzz, where xxyyzz corresponds to a portion of the device’s Bluetooth address. The figure on the side hows an example of scanning the device we tested. To establish a connection with the device, the user must click the **Connect** button.
+![ble_scan](/resources/ble_scan.png)
+
+The device details are displayed in the adjacent image. Users may rename the Service and Characteristic fields for easier identification. To begin sending commands, choose the **Write** option. To receive messages from the device, enable the **Notify** option.
+![ble_scan](/resources/ble_char.png)
+
+The image below illustrates the screen after selecting the Write option. At this point, users can input commands, as presented above, to be transmitted to the device for execution.
+*Note: Append the value 0x0A (LF) or 0x0D (CR) at the end of the line to terminate a CLI command.*
+![ble_scan](/resources/ble_write.png) 
+
+---
+
+## References
+
+* [SimpleFOC Documentation](https://docs.simplefoc.com/)
+* [Commander Interface](https://docs.simplefoc.com/commander_interface)
+* [Arduino Nano Matter Manual](https://docs.arduino.cc/tutorials/nano-matter/user-manual/)
+* [Silicon Labs Arduino Core](https://github.com/SiliconLabs/arduino)
+* [SimpleFOC Studio](https://github.com/JorgeMaker/SimpleFOCStudio)
+## Contributing
+Please follow the [CONTRIBUTING](./.github/CONTRIBUTING.md) guideline.
+
+## License
+See the [LICENSE.md](./LICENSE.md) file for details.
