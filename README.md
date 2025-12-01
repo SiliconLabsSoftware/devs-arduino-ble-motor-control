@@ -1,5 +1,5 @@
 # Silabs SimpleFOC motor control with BLE example
-This repository contains the example application to demonstrate the simpleFOC closed loop speed control operation with BLE communication. The application accepts BLE connection from a mobile phone and receives commands via Serial Profile Protocol (SPP).
+This repository contains the example application to demonstrate the SimpleFOC closed loop speed control operation with BLE communication. The application accepts BLE connection from a mobile phone and receives commands via Serial Profile Protocol (SPP).
 
 ## Hardware requirements
 * **Arduino Nano Matter (EFR32MG24)** [https://docs.arduino.cc/hardware/nano-matter/](https://docs.arduino.cc/hardware/nano-matter/) or **SparkFun Thing Plus Matter** [https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html](https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html)
@@ -8,7 +8,7 @@ This repository contains the example application to demonstrate the simpleFOC cl
 * USB cable for programming and serial monitor
 
 ## Hardware Setup
-A dedicated interface board set-up connecting the Motor - Power Stage - Nano Matter. Jump wires can be used as well to connect the boards.
+A dedicated interface board setup connecting the Motor - Power Stage - Nano Matter. Jump wires can be used as well to connect the boards.
 
 ![hw_setup](resources/hw_setup.png)
 
@@ -22,7 +22,7 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 
 | From (Nano Matter Pin) | To (DRV8305 BoosterPack Pin) | BLDC MOTOR | Function / Description | 
 | :--- | :--- | :--- | :---|
-| `3.3V` | `3V3` | HALL/ENC Supply*  | 3.3V Power the BoosterPack provides 3.3V through an LDO |
+| `3.3V` | `3V3` | HALL/ENC Supply*  | 3.3V Power; the BoosterPack provides 3.3V through an LDO |
 | `GND` | `PowerSupply GND` | HALL/ENC sensor GND | Common Ground |
 | N/A | `PowerSupply 12V` | N/A | Power supply for power stage 4.4 to 45 V, consider motor power|
 | `A0`  | `ISENA` | N/A | Phase A current sense |
@@ -32,10 +32,10 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 | `A4`  | `VSENB` | N/A | Phase B Voltage sense (Optional, not mandatory to run examples) |
 | `A5`  | `VSENC` | N/A | Phase C Voltage sense (Optional, not mandatory to run examples)|
 | `A6`  | `VSENVPVDD`   | N/A | DC BUS Voltage sense (Optional, not mandatory to run examples)|
-| `D0` (MOSI1)  | `SDI` | N/A | DRV8035 SPI connection, configuration and status reading (Optional, not mandatory to run examples)|
-| `D1` (MISO1)  | `SDO` | N/A | DRV8035 SPI connection, configuration and status reading (Optional, not mandatory to run examples)|
-| `D2` (SCK1)   | `SCLK`| N/A | DRV8035 SPI clock, configuration and status reading (Optional, not mandatory to run examples)|
-| `D3` (SS1)    | `SCS` | N/A | DRV8035 SPI chip select, configuration and status reading (Optional, not mandatory to run examples)|
+| `D0` (MOSI1)  | `SDI` | N/A | DRV8305 SPI connection, configuration and status reading (Optional, not mandatory to run examples)|
+| `D1` (MISO1)  | `SDO` | N/A | DRV8305 SPI connection, configuration and status reading (Optional, not mandatory to run examples)|
+| `D2` (SCK1)   | `SCLK`| N/A | DRV8305 SPI clock, configuration and status reading (Optional, not mandatory to run examples)|
+| `D3` (SS1)    | `SCS` | N/A | DRV8305 SPI chip select, configuration and status reading (Optional, not mandatory to run examples)|
 | `D4`  | N/A | HALL A or Encoder A | Motor sensor connection (Hall configuration in examples) |
 | `D5`  | N/A | HALL B or Encoder B | Motor sensor connection (Hall configuration in examples) |
 | `D6`  | `PWMHA` | N/A | PWM Phase A High-Side Gate Signal |
@@ -52,12 +52,14 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 
 **Important Notes:**
 *   **Power:** Ensure the DRV8305's `PVDD` and `GVDD` jumpers are correctly set for your motor's voltage. The power supply should be rated at least twice the motor’s nominal power. The BoosterPack can supply the Nano Matter if it is not connected to USB.
-* **Rotor sensor:** Some Encoder or Hall sensors might require 5V supply, make sure of proper level shifting if required. 
+* **Rotor sensor:** Some Encoder or Hall sensors might require 5V supply, ensure proper level shifting if required. 
 *   **SPI:** The SPI connection (`nSCS`, `SPI_CLK`, `SPI_MOSI`, `SPI_MISO`) is used to configure the DRV8305 driver IC (e.g., set gain, fault parameters). It is optional for the examples. The examples are using the default gate driver configuration. Only needed if you wish to change the default gate driver configuration (e.g., dead time, fault parameters).
 
 ---
 
 ## Software Setup
+
+### Requirements
 
 1. **Arduino IDE**
 
@@ -95,15 +97,64 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 
 ---
 
-## Running the Examples
+### Build
+
+#### Build with Arduino IDE
+
+1. Open the `.ino` file in Arduino IDE.
+2. Select your **Arduino Nano Matter** or **SparkFun Thing Plus Matter** board.
+3. Compile.
+
+#### Build with Arduino-CLI
+There are multiple ways to build the project.
+- Use the **build-all.sh** to build the image for all the available boards
+   - *Note: "build-all.sh clean" removes all the build directories*
+- Use the **build.sh** from the project folder *(projects/efr32_ble_velocity_6pwm)* to build the image for all the available boards
+   - *Note: You can build separate images with "build.sh nano_matter" or "build.sh thingplusmatter" commands*
+   - *Note: You can remove the build directories with "clean.sh" script.*
+
+#### Build with Docker
+1. Install Docker: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+2. Build a docker image. (x86_64 platform is preferred, use "--platform=linux/amd64" if needed)
+   ```bash
+      docker build -t efr32-ble-velocity-6pwm-build-env:latest .
+   ```
+3. Run the docker image
+   ```bash
+      docker run --rm -v .:/workspace efr32-ble-velocity-6pwm-build-env:latest /bin/bash -c "cd /workspace && bash build-all.sh"
+   ```
+### Flash and Run
+
+#### Arduino IDE
 
 1. Open the `.ino` file in Arduino IDE.
 2. Select your **Arduino Nano Matter** or **SparkFun Thing Plus Matter** board.
 3. Compile & upload.
 4. Open the Serial Monitor (115200 baud)
 5. (Optional) Connect with monitoring tools. 
-    1. Modification of the example code is necessary to enable monitoring feature. *(Note: Monitoring decreases the preformance)*
+    1. Modification of the example code is necessary to enable monitoring feature. *(Note: Monitoring decreases the performance)*
     2. [Enable Monitoring](https://docs.simplefoc.com/monitoring)
+
+#### Arduino-CLI
+
+1. (Optional) Setup udev rules to access openocd (Linux)
+   - Add the following rule file to **/etc/udev/rules.d/93-arduino.rules**
+      ```bash
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="2544", ATTRS{idProduct}=="0001", GROUP="plugdev", TAG+="uaccess"
+      ```
+   - Reload udev rules
+      ```bash
+      sudo udevadm control --reload-rules && sudo udevadm trigger
+      ```
+2. Program bootloader (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**)
+   ```bash
+      arduino-cli burn-bootloader -b <target> --programmer openocd
+   ```
+3. Upload sketch (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**)
+   ```bash
+       arduino-cli upload -b <target> --build-path build --programmer openocd
+   ```
+
 
 ### Example Commands
 
@@ -115,10 +166,10 @@ M-50   # Run counter-clockwise at 50 rad/s
 M0     # Stop motor
 ```
 
-Command can be sent via the serial or the BLE interface. The command structure are the same on both interface.
+Commands can be sent via the serial or the BLE interface. The command structures are the same on both interfaces.
 
 #### BLE Connection Setup
-Scan for BLE devices using **Simplicity Connect** application. In the list of detected devices, identify the one named in the format motor_xxyyzz, where xxyyzz corresponds to a portion of the device’s Bluetooth address. The figure on the side hows an example of scanning the device we tested. To establish a connection with the device, the user must click the **Connect** button.
+Scan for BLE devices using **Simplicity Connect** application. In the list of detected devices, identify the one named in the format motor_xxyyzz, where xxyyzz corresponds to a portion of the device's Bluetooth address. The figure on the side shows an example of scanning the device we tested. To establish a connection with the device, the user must click the **Connect** button.
 ![ble_scan](/resources/ble_scan.png)
 
 The device details are displayed in the adjacent image. Users may rename the Service and Characteristic fields for easier identification. To begin sending commands, choose the **Write** option. To receive messages from the device, enable the **Notify** option.
