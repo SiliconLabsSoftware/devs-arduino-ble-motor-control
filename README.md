@@ -2,7 +2,7 @@
 This repository contains the example application to demonstrate the SimpleFOC closed loop speed control operation with BLE communication. The application accepts BLE connection from a mobile phone and receives commands via Serial Profile Protocol (SPP).
 
 ## Hardware requirements
-* **Arduino Nano Matter (EFR32MG24)** [https://docs.arduino.cc/hardware/nano-matter/](https://docs.arduino.cc/hardware/nano-matter/) or **SparkFun Thing Plus Matter** [https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html](https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html)
+* **[Arduino Nano Matter (EFR32MG24)](https://docs.arduino.cc/hardware/nano-matter/)** or **[SparkFun Thing Plus Matter](https://www.sparkfun.com/sparkfun-thing-plus-matter-mgm240p.html)**
 * **DRV8305 BoosterPack (BOOSTXL-DRV8305EVM)**
 * **BLDC Motor: DF45M024053 – A2**
 * USB cable for programming and serial monitor
@@ -79,7 +79,8 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 3. **SimpleFOC**
 
     * Use SimpleFOC **2.3.6 or later**
-      * *Note: At the time of writing the 2.3.6 version is not yet available. Use the development branch until the release. [Download development branch](https://github.com/simplefoc/Arduino-FOC/archive/refs/heads/dev.zip)*
+      * *Note: At the time of writing the 2.3.6 version is not yet available. Use the development branch until the release. [Development branch](https://github.com/simplefoc/Arduino-FOC/tree/dev)*
+      * *Download the development branch as a zip.*
       * *Unzip the downloaded library and copy the library folder ("Arduino-FOC-dev" or similar) to the Arduino library folder. (Arduino/libraries)*
       * *In this case the steps below are not needed.*
     * Open *Library Manager* in Arduino IDE.
@@ -103,7 +104,7 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 
 1. Open the `.ino` file in Arduino IDE.
 2. Select your **Arduino Nano Matter** or **SparkFun Thing Plus Matter** board.
-3. Compile.
+3. Verify (Compile).
 
 #### Build with Arduino-CLI
 There are multiple ways to build the project.
@@ -115,7 +116,7 @@ There are multiple ways to build the project.
 
 #### Build with Docker
 1. Install Docker: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
-2. Build a docker image. (x86_64 platform is preferred, use "--platform=linux/amd64" if needed)
+2. Build a docker image. (Default platform is x86_64, use "--platform=linux/amd64" if needed)
    ```bash
       docker build -t efr32-ble-velocity-6pwm-build-env:latest .
    ```
@@ -152,7 +153,7 @@ There are multiple ways to build the project.
    ```
 3. Upload sketch (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**)
    ```bash
-       arduino-cli upload -b <target> --build-path build --programmer openocd
+       arduino-cli upload -b <target> --build-path "/path/to/build/" --programmer openocd
    ```
 
 
