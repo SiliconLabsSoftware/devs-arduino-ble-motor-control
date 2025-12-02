@@ -1,4 +1,4 @@
-/** 
+/**
  * Silabs MG24 6PWM closed loop velocity control example with HALL sensor based rotor position and Bluetooth LE serial
  *
  * HARDWARE CONFIGURATION:
@@ -55,30 +55,50 @@ Commander *command;
 // Hall sensor instance
 HallSensor *sensor;
 
-// Interrupt routine intialisation
-void doA() { sensor->handleA(); }
-void doB() { sensor->handleB(); }
-void doC() { sensor->handleC(); }
+// Interrupt routine initialisation
+void doA()
+{
+  sensor->handleA();
+}
+void doB()
+{
+  sensor->handleB();
+}
+void doC()
+{
+  sensor->handleC();
+}
 
-void doMotor(char* cmd) {
-  if (!command) return;
+void doMotor(char* cmd)
+{
+  if (!command) {
+    return;
+  }
   command->motor(motor, cmd);
 }
 
-bool sendReady(size_t index, const uint8_t *buffer, size_t size) {
-  if (!buffer) return false;
-  if (index < size && (buffer[index] == '\r' || buffer[index] == '\n')) return true;
+bool sendReady(size_t index, const uint8_t *buffer, size_t size)
+{
+  if (!buffer) {
+    return false;
+  }
+  if (index < size && (buffer[index] == '\r' || buffer[index] == '\n')) {
+    return true;
+  }
   return false;
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   SimpleFOCDebug::enable(&Serial);
 
   // Driver
   driver = new BLDCDriver6PWM(PWM_1H, PWM_1L, PWM_2H, PWM_2L, PWM_3H, PWM_3L, PWM_EN);
-  if (!driver) return;
+  if (!driver) {
+    return;
+  }
 
   // Power supply voltage [V]
   driver->voltage_power_supply = 24;
@@ -87,18 +107,22 @@ void setup() {
   // PWM frequency to be used [Hz]
   driver->pwm_frequency = 20000;
   // Dead zone percentage of the duty cycle - default 0.02 - 2%
-  // Can set value to 0 because the TI driver (DRV8305) will provide the 
+  // Can set value to 0 because the TI driver (DRV8305) will provide the
   // required dead-time.
   driver->dead_zone = 0;
 
   // Init driver
-  if (!driver->init()) return;
+  if (!driver->init()) {
+    return;
+  }
 
   driver->enable();
 
   // Setup Hall Sensor
   sensor = new HallSensor(HALL_A, HALL_B, HALL_C, MOTOR_PP);
-  if (!sensor) return;
+  if (!sensor) {
+    return;
+  }
 
   sensor->init();
 
@@ -114,7 +138,9 @@ void setup() {
 
   // Setup BLDC Motor
   motor = new BLDCMotor(MOTOR_PP);
-  if (!motor) return;
+  if (!motor) {
+    return;
+  }
 
   // Link the motor and the driver
   motor->linkDriver(driver);
@@ -135,7 +161,7 @@ void setup() {
   // velocity PI controller parameters
   motor->PID_velocity.P = 0.05f;
   motor->PID_velocity.I = 1;
-  
+
   // velocity low pass filtering time constant
   motor->LPF_velocity.Tf = 0.01f;
 
@@ -152,7 +178,9 @@ void setup() {
 
   // Commander
   command = new Commander(Serial);
-  if (!command) return;
+  if (!command) {
+    return;
+  }
 
   // add target command M
   command->add('M', doMotor, "motor");
@@ -177,8 +205,11 @@ void setup() {
   _delay(1000);
 }
 
-void loop() {
-  if (!allow_run) return;
+void loop()
+{
+  if (!allow_run) {
+    return;
+  }
 
   // main FOC algorithm function
   // the faster you run this function the better

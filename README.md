@@ -20,7 +20,7 @@ Connect the Arduino Nano Matter board to the DRV8305EVM according to the board p
 
 This table describes the connections between the Arduino Nano Matter, the TI BOOSTXL-DRV8305 driver board, and a 3-phase BLDC motor with Hall sensors.
 
-| From (Nano Matter Pin) | To (DRV8305 BoosterPack Pin) | BLDC MOTOR | Function / Description | 
+| From (Nano Matter Pin) | To (DRV8305 BoosterPack Pin) | BLDC MOTOR | Function / Description |
 | :--- | :--- | :--- | :---|
 | `3.3V` | `3V3` | HALL/ENC Supply*  | 3.3V Power; the BoosterPack provides 3.3V through an LDO |
 | `GND` | `PowerSupply GND` | HALL/ENC sensor GND | Common Ground |
@@ -52,7 +52,7 @@ This table describes the connections between the Arduino Nano Matter, the TI BOO
 
 **Important Notes:**
 *   **Power:** Ensure the DRV8305's `PVDD` and `GVDD` jumpers are correctly set for your motor's voltage. The power supply should be rated at least twice the motor’s nominal power. The BoosterPack can supply the Nano Matter if it is not connected to USB.
-* **Rotor sensor:** Some Encoder or Hall sensors might require 5V supply, ensure proper level shifting if required. 
+* **Rotor sensor:** Some Encoder or Hall sensors might require 5V supply, ensure proper level shifting if required.
 *   **SPI:** The SPI connection (`nSCS`, `SPI_CLK`, `SPI_MOSI`, `SPI_MISO`) is used to configure the DRV8305 driver IC (e.g., set gain, fault parameters). It is optional for the examples. The examples are using the default gate driver configuration. Only needed if you wish to change the default gate driver configuration (e.g., dead time, fault parameters).
 
 ---
@@ -131,7 +131,7 @@ There are multiple ways to build the project.
 2. Select your **Arduino Nano Matter** or **SparkFun Thing Plus Matter** board.
 3. Compile & upload.
 4. Open the Serial Monitor (115200 baud)
-5. (Optional) Connect with monitoring tools. 
+5. (Optional) Connect with monitoring tools.
     1. Modification of the example code is necessary to enable monitoring feature. *(Note: Monitoring decreases the performance)*
     2. [Enable Monitoring](https://docs.simplefoc.com/monitoring)
 
@@ -170,14 +170,17 @@ Commands can be sent via the serial or the BLE interface. The command structures
 
 #### BLE Connection Setup
 Scan for BLE devices using **Simplicity Connect** application. In the list of detected devices, identify the one named in the format motor_xxyyzz, where xxyyzz corresponds to a portion of the device's Bluetooth address. The figure on the side shows an example of scanning the device we tested. To establish a connection with the device, the user must click the **Connect** button.
+
 ![ble_scan](/resources/ble_scan.png)
 
 The device details are displayed in the adjacent image. Users may rename the Service and Characteristic fields for easier identification. To begin sending commands, choose the **Write** option. To receive messages from the device, enable the **Notify** option.
+
 ![ble_scan](/resources/ble_char.png)
 
 The image below illustrates the screen after selecting the Write option. At this point, users can input commands, as presented above, to be transmitted to the device for execution.
 *Note: Append the value 0x0A (LF) or 0x0D (CR) at the end of the line to terminate a CLI command.*
-![ble_scan](/resources/ble_write.png) 
+
+![ble_scan](/resources/ble_write.png)
 
 ---
 

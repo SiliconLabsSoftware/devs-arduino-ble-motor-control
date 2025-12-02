@@ -15,14 +15,16 @@ extern "C" {
 #include <vector>
 
 // SPP service UUID: 4880c12c-fdcb-4077-8920-a450d7f9b907
-const uuid_128 spp_service_uuid = { 
-  .data = { 0x07, 0xb9, 0xf9, 0xd7, 0x50, 0xa4, 0x20, 0x89, 0x77, 0x40, 0xcb, 0xfd, 0x2c, 0xc1, 0x80, 0x48, } };
+const uuid_128 spp_service_uuid = {
+  .data = { 0x07, 0xb9, 0xf9, 0xd7, 0x50, 0xa4, 0x20, 0x89, 0x77, 0x40, 0xcb, 0xfd, 0x2c, 0xc1, 0x80, 0x48, }
+};
 
 // SPP data UUID: fec26ec4-6d71-4442-9f81-55bc21d658d6
-const uuid_128 spp_data_characteristic_uuid = { 
-  .data = { 0xd6, 0x58, 0xd6, 0x21, 0xbc, 0x55, 0x81, 0x9f, 0x42, 0x44, 0x71, 0x6d, 0xc4, 0x6e, 0xc2, 0xfe, } };
+const uuid_128 spp_data_characteristic_uuid = {
+  .data = { 0xd6, 0x58, 0xd6, 0x21, 0xbc, 0x55, 0x81, 0x9f, 0x42, 0x44, 0x71, 0x6d, 0xc4, 0x6e, 0xc2, 0xfe, }
+};
 
-class sppBLEClass : public Stream {
+class sppBLEClass: public Stream {
 public:
   sppBLEClass();
 
@@ -96,7 +98,7 @@ private:
     ST_DISCONNECTED,
     ST_READY,
   };
-  state _state{ST_NOT_STARTED};
+  state _state { ST_NOT_STARTED };
 
   // Log
   static const uint8_t _printf_buffer_size = 64u;
@@ -107,7 +109,7 @@ private:
   };
   void log(const char* fmt, ...);
 
-  log_t _log{false, "[sppBLE] "};
+  log_t _log { false, "[sppBLE] " };
 
   // Stream
   bool (*user_checksendcondition_callback)(size_t, const uint8_t*, size_t);
@@ -138,7 +140,7 @@ private:
   void init_gattdb();
 
   static const size_t _max_ble_name_size = 512u;
-  gatt_db_t _gatt_db{ false, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, "unknown", true };
+  gatt_db_t _gatt_db { false, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, "unknown", true };
   void (*user_oninitgattdb_callback)(uint16_t);
 
   // BLE:ADV
@@ -156,7 +158,7 @@ private:
   virtual void start_advertising();
   virtual void stop_advertising();
 
-  adv_t _adv{0xFF, sl_bt_advertiser_general_discoverable, sl_bt_legacy_advertiser_connectable, 160, 160, 0, 0};
+  adv_t _adv { 0xFF, sl_bt_advertiser_general_discoverable, sl_bt_legacy_advertiser_connectable, 160, 160, 0, 0 };
 
   // BLE:Connections
   struct connection_t {
@@ -170,7 +172,8 @@ private:
       uint8_t conn,
       uint8_t bonding,
       const bd_addr &addr
-    ) : is_master(is_master), conn(conn), bonding(bonding), addr(addr) {}
+      ) : is_master(is_master), conn(conn), bonding(bonding), addr(addr) {
+    }
   };
 
   bool add_connection(
@@ -182,14 +185,14 @@ private:
   void close_connection(
     uint8_t conn);
 
-  std::vector<connection_t> _connections;
+  std::vector < connection_t > _connections;
 
   // BLE:SPP
   static const uint16_t _max_ble_transfer_size = 250u;
   static const size_t _data_buffer_size = 512u;
 
-  RingBufferN<_data_buffer_size> _rx_buf;
-  RingBufferN<_data_buffer_size> _tx_buf;
+  RingBufferN < _data_buffer_size > _rx_buf;
+  RingBufferN < _data_buffer_size > _tx_buf;
 
   SemaphoreHandle_t _rx_buf_mutex;
   StaticSemaphore_t _rx_buf_mutex_buf;

@@ -45,7 +45,7 @@ if [ -z "$DEVICE_PARAM" ]; then
 else
     # Device parameter provided: check if it matches
     BUILD_DEVICES=""
-    
+
     for device in $DEVICES; do
         device_name="${device##*:}"
         if [ "$device_name" = "$DEVICE_PARAM" ] || [ "$device" = "$DEVICE_PARAM" ]; then
@@ -53,7 +53,7 @@ else
             break
         fi
     done
-    
+
     if [ -z "$BUILD_DEVICES" ]; then
         echo "Error: Device '$DEVICE_PARAM' not found in device matrix" >&2
         echo "Available devices:" >&2
@@ -76,18 +76,18 @@ failed_devices=""
 for device in $BUILD_DEVICES; do
     # Extract device name after last ":"
     device_name="${device##*:}"
-    
+
     # Build directory for this specific device
     build_path="$SCRIPT_DIR/build_$device_name"
-    
+
     # Create build directory if it doesn't exist
     mkdir -p "$build_path"
-    
+
     echo "=========================================="
     echo "Compiling for device: $device"
     echo "Build path: $build_path"
     echo "=========================================="
-    
+
     if arduino-cli compile \
         --fqbn "$device" \
         --board-options protocol_stack=ble_silabs \
