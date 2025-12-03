@@ -9,33 +9,39 @@ sppBLEClass::sppBLEClass() :
   user_onbleevent_callback(nullptr),
   user_onconnect_callback(nullptr),
   user_ondisconnect_callback(nullptr),
-  user_oninitgattdb_callback(nullptr) {
+  user_oninitgattdb_callback(nullptr)
+{
   this->_rx_buf_mutex = xSemaphoreCreateMutexStatic(&this->_rx_buf_mutex_buf);
   configASSERT(this->_rx_buf_mutex);
   this->_tx_buf_mutex = xSemaphoreCreateMutexStatic(&this->_tx_buf_mutex_buf);
   configASSERT(this->_tx_buf_mutex);
 }
 
-int sppBLEClass::available() {
+int sppBLEClass::available()
+{
   return _rx_buf.available();
 }
 
-int sppBLEClass::read() {
+int sppBLEClass::read()
+{
   xSemaphoreTake(_rx_buf_mutex, portMAX_DELAY);
   int data = _rx_buf.read_char();
   xSemaphoreGive(_rx_buf_mutex);
   return data;
 }
 
-int sppBLEClass::peek() {
+int sppBLEClass::peek()
+{
   return _rx_buf.peek();
 }
 
-size_t sppBLEClass::write(uint8_t data) {
+size_t sppBLEClass::write(uint8_t data)
+{
   return write(&data, 1);
 }
 
-size_t sppBLEClass::write(const uint8_t *buffer, size_t size) {
+size_t sppBLEClass::write(const uint8_t *buffer, size_t size)
+{
   if (_tx_buf.isFull()) {
     log("Tx buffer overflow!");
     transfer_outgoing_data();
@@ -70,13 +76,17 @@ size_t sppBLEClass::write(const uint8_t *buffer, size_t size) {
 
 void sppBLEClass::onCheckSendCondition(
   bool (*user_checksendcondition_callback)(size_t, const uint8_t*, size_t)
-) {
-  if (!user_checksendcondition_callback) return;
+  )
+{
+  if (!user_checksendcondition_callback) {
+    return;
+  }
   this->user_checksendcondition_callback = user_checksendcondition_callback;
 }
 
 // BLE:GATT DB
-void sppBLEClass::set_ble_name(const char *ble_name) {
+void sppBLEClass::set_ble_name(const char *ble_name)
+{
   _gatt_db.device_name = ble_name;
 
   if (!_gatt_db.initialized) {
@@ -95,20 +105,26 @@ void sppBLEClass::set_ble_name(const char *ble_name) {
   }
 }
 
-const char *sppBLEClass::get_ble_name() {
+const char *sppBLEClass::get_ble_name()
+{
   return _gatt_db.device_name;
 }
 
-void sppBLEClass::set_name_show_uuid(bool enable) {
+void sppBLEClass::set_name_show_uuid(bool enable)
+{
   _gatt_db.device_name_support_uuid = enable;
 }
 
-bool sppBLEClass::get_name_show_uuid() {
+bool sppBLEClass::get_name_show_uuid()
+{
   return _gatt_db.device_name_support_uuid;
 }
 
-void sppBLEClass::init_gattdb() {
-  if (_gatt_db.initialized) return;
+void sppBLEClass::init_gattdb()
+{
+  if (_gatt_db.initialized) {
+    return;
+  }
 
   sl_status_t sc;
 
@@ -137,10 +153,10 @@ void sppBLEClass::init_gattdb() {
     app_assert_status(sc);
 
     snprintf(dev_name, sizeof(dev_name), "%s_%02x%02x%02x",
-              _gatt_db.device_name,
-              address.addr[2],
-              address.addr[1],
-              address.addr[0]);
+             _gatt_db.device_name,
+             address.addr[2],
+             address.addr[1],
+             address.addr[0]);
   } else {
     strncpy(dev_name, _gatt_db.device_name, strlen(_gatt_db.device_name));
     dev_name[strlen(_gatt_db.device_name)] = '\0';
@@ -216,61 +232,77 @@ void sppBLEClass::init_gattdb() {
   _gatt_db.initialized = true;
 }
 
-void sppBLEClass::onInitGATTDB(void (*user_oninitgattdb_callback)(uint16_t)) {
-  if (!user_oninitgattdb_callback) return;
+void sppBLEClass::onInitGATTDB(void (*user_oninitgattdb_callback)(uint16_t))
+{
+  if (!user_oninitgattdb_callback) {
+    return;
+  }
   this->user_oninitgattdb_callback = user_oninitgattdb_callback;
 }
 
 // BLE:ADV
-void sppBLEClass::set_adv_discovery_mode(uint8_t discovery_mode) {
+void sppBLEClass::set_adv_discovery_mode(uint8_t discovery_mode)
+{
   _adv.disc_mode = discovery_mode;
 }
 
-uint8_t sppBLEClass::get_adv_discovery_mode() {
+uint8_t sppBLEClass::get_adv_discovery_mode()
+{
   return _adv.disc_mode;
 }
 
-void sppBLEClass::set_adv_connection_mode(uint8_t connection_mode) {
+void sppBLEClass::set_adv_connection_mode(uint8_t connection_mode)
+{
   _adv.conn_mode = connection_mode;
 }
 
-uint8_t sppBLEClass::get_adv_connection_mode() {
+uint8_t sppBLEClass::get_adv_connection_mode()
+{
   return _adv.conn_mode;
 }
 
-void sppBLEClass::set_adv_interval_min(uint32_t interval_min) {
+void sppBLEClass::set_adv_interval_min(uint32_t interval_min)
+{
   _adv.interval_min = interval_min;
 }
 
-uint32_t sppBLEClass::get_adv_interval_min() {
+uint32_t sppBLEClass::get_adv_interval_min()
+{
   return _adv.interval_min;
 }
 
-void sppBLEClass::set_adv_interval_max(uint32_t interval_max) {
+void sppBLEClass::set_adv_interval_max(uint32_t interval_max)
+{
   _adv.interval_max = interval_max;
 }
 
-uint32_t sppBLEClass::get_adv_interval_max() {
+uint32_t sppBLEClass::get_adv_interval_max()
+{
   return _adv.interval_max;
 }
 
-void sppBLEClass::set_adv_duration(uint16_t duration) {
+void sppBLEClass::set_adv_duration(uint16_t duration)
+{
   _adv.duration = duration;
 }
 
-uint16_t sppBLEClass::get_adv_duration() {
+uint16_t sppBLEClass::get_adv_duration()
+{
   return _adv.duration;
 }
 
-void sppBLEClass::set_adv_max_event(uint8_t max_event) {
+void sppBLEClass::set_adv_max_event(uint8_t max_event)
+{
   _adv.max_event = max_event;
 }
 
-uint8_t sppBLEClass::get_adv_max_event() {
+uint8_t sppBLEClass::get_adv_max_event()
+{
   return _adv.max_event;
 }
 
-void sppBLEClass::init_advertising() {
+void sppBLEClass::init_advertising()
+{
   sl_status_t sc;
 
   if (_adv.handle != SL_BT_INVALID_ADVERTISING_SET_HANDLE) {
@@ -289,8 +321,11 @@ void sppBLEClass::init_advertising() {
   app_assert_status(sc);
 }
 
-void sppBLEClass::start_advertising() {
-  if (_adv.handle == SL_BT_INVALID_ADVERTISING_SET_HANDLE) return;
+void sppBLEClass::start_advertising()
+{
+  if (_adv.handle == SL_BT_INVALID_ADVERTISING_SET_HANDLE) {
+    return;
+  }
 
   sl_status_t sc;
 
@@ -303,8 +338,11 @@ void sppBLEClass::start_advertising() {
   app_assert_status(sc);
 }
 
-void sppBLEClass::stop_advertising() {
-  if (_adv.handle == SL_BT_INVALID_ADVERTISING_SET_HANDLE) return;
+void sppBLEClass::stop_advertising()
+{
+  if (_adv.handle == SL_BT_INVALID_ADVERTISING_SET_HANDLE) {
+    return;
+  }
   sl_status_t sc = sl_bt_advertiser_stop(_adv.handle);
   app_assert_status(sc);
   sc = sl_bt_advertiser_delete_set(_adv.handle);
@@ -312,7 +350,8 @@ void sppBLEClass::stop_advertising() {
 }
 
 // BLE: Connections
-void sppBLEClass::print_connections() {
+void sppBLEClass::print_connections()
+{
   for (const auto & it : _connections) {
     log("conn:0x%02X bonding:0x%02X %s addr:%02X:%02X:%02X:%02X:%02X:%02X\n",
         it.conn,
@@ -332,8 +371,11 @@ bool sppBLEClass::add_connection(
   uint8_t conn,
   uint8_t bonding,
   const bd_addr &addr
-) {
-  if (_connections.size() >= SL_BT_CONFIG_MAX_CONNECTIONS) return false;
+  )
+{
+  if (_connections.size() >= SL_BT_CONFIG_MAX_CONNECTIONS) {
+    return false;
+  }
 
   _connections.emplace_back(is_master, conn, bonding, addr);
 
@@ -342,7 +384,8 @@ bool sppBLEClass::add_connection(
 
 void sppBLEClass::close_connection(
   uint8_t conn
-) {
+  )
+{
   for (auto it = _connections.begin(); it != _connections.end(); ++it) {
     if (it->conn == conn) {
       _connections.erase(it);
@@ -357,10 +400,11 @@ size_t sppBLEClass::send_data(
   uint8_t conn,
   uint16_t length,
   uint8_t *data
-) {
+  )
+{
   sl_status_t sc;
   if (conn == 0xFF) {
-    sc = sl_bt_gatt_server_notify_all(_gatt_db.spp_data_characteristic_handle, 
+    sc = sl_bt_gatt_server_notify_all(_gatt_db.spp_data_characteristic_handle,
                                       length,
                                       data);
   } else {
@@ -370,51 +414,66 @@ size_t sppBLEClass::send_data(
                                              data);
   }
 
-  if (sc == SL_STATUS_OK) return length;
+  if (sc == SL_STATUS_OK) {
+    return length;
+  }
   return 0;
 }
 
 size_t sppBLEClass::send_mesg(
   uint8_t conn,
   const char *message
-) {
+  )
+{
   return send_data(conn, strlen(message), (uint8_t *)message);
 }
 
-size_t sppBLEClass::transfer_outgoing_data(bool safe) {
+size_t sppBLEClass::transfer_outgoing_data(bool safe)
+{
   uint8_t local_buf[_max_ble_transfer_size];
   size_t local_buf_idx = 0;
 
-  if (safe) xSemaphoreTake(_tx_buf_mutex, portMAX_DELAY);
+  if (safe) {
+    xSemaphoreTake(_tx_buf_mutex, portMAX_DELAY);
+  }
 
   for (; local_buf_idx < _max_ble_transfer_size && _tx_buf.available(); ++local_buf_idx) {
     local_buf[local_buf_idx] = _tx_buf.read_char();
   }
 
-  if (safe) xSemaphoreGive(_tx_buf_mutex);
+  if (safe) {
+    xSemaphoreGive(_tx_buf_mutex);
+  }
 
   return send_data(0xFF, local_buf_idx, local_buf);
 }
 
 // Log
-void sppBLEClass::enable_log(bool enable) {
+void sppBLEClass::enable_log(bool enable)
+{
   _log.enable = enable;
 }
 
-bool sppBLEClass::log_is_enalbe() {
+bool sppBLEClass::log_is_enalbe()
+{
   return _log.enable;
 }
 
-void sppBLEClass::set_log_tag(const char *tag) {
+void sppBLEClass::set_log_tag(const char *tag)
+{
   _log.tag = tag;
 }
 
-const char *sppBLEClass::get_log_tag() {
+const char *sppBLEClass::get_log_tag()
+{
   return _log.tag;
 }
 
-void sppBLEClass::log(const char* fmt, ...) {
-  if (!_log.enable) return;
+void sppBLEClass::log(const char* fmt, ...)
+{
+  if (!_log.enable) {
+    return;
+  }
 
   char message[_printf_buffer_size];
   va_list args;
@@ -426,23 +485,35 @@ void sppBLEClass::log(const char* fmt, ...) {
 }
 
 // BLE
-void sppBLEClass::onBLEEvent(void (*user_onbleevent_callback)(sl_bt_msg_t*)) {
-  if (!user_onbleevent_callback) return;
+void sppBLEClass::onBLEEvent(void (*user_onbleevent_callback)(sl_bt_msg_t*))
+{
+  if (!user_onbleevent_callback) {
+    return;
+  }
   this->user_onbleevent_callback = user_onbleevent_callback;
 }
 
-void sppBLEClass::onConnect(void (*user_onconnect_callback)(uint8_t)) {
-  if (!user_onconnect_callback) return;
+void sppBLEClass::onConnect(void (*user_onconnect_callback)(uint8_t))
+{
+  if (!user_onconnect_callback) {
+    return;
+  }
   this->user_onconnect_callback = user_onconnect_callback;
 }
 
-void sppBLEClass::onDisconnect(void (*user_ondisconnect_callback)(uint8_t)) {
-  if (!user_ondisconnect_callback) return;
+void sppBLEClass::onDisconnect(void (*user_ondisconnect_callback)(uint8_t))
+{
+  if (!user_ondisconnect_callback) {
+    return;
+  }
   this->user_ondisconnect_callback = user_ondisconnect_callback;
 }
 
-void sppBLEClass::handle_boot_event(sl_bt_msg_t *evt) {
-  if (!evt) return;
+void sppBLEClass::handle_boot_event(sl_bt_msg_t *evt)
+{
+  if (!evt) {
+    return;
+  }
 
   log("BLE stack booted");
 
@@ -454,8 +525,11 @@ void sppBLEClass::handle_boot_event(sl_bt_msg_t *evt) {
   }
 }
 
-void sppBLEClass::handle_conn_open(sl_bt_msg_t *evt) {
-  if (!evt) return;
+void sppBLEClass::handle_conn_open(sl_bt_msg_t *evt)
+{
+  if (!evt) {
+    return;
+  }
 
   sl_bt_evt_connection_opened_t *ev_conn = &evt->data.evt_connection_opened;
 
@@ -464,7 +538,9 @@ void sppBLEClass::handle_conn_open(sl_bt_msg_t *evt) {
   if (!add_connection(false,
                       ev_conn->connection,
                       ev_conn->bonding,
-                      ev_conn->address)) return;
+                      ev_conn->address)) {
+    return;
+  }
 
   if (_connections.size() < SL_BT_CONFIG_MAX_CONNECTIONS) {
     start_advertising();
@@ -477,8 +553,11 @@ void sppBLEClass::handle_conn_open(sl_bt_msg_t *evt) {
   }
 }
 
-void sppBLEClass::handle_conn_close(sl_bt_msg_t *evt) {
-  if (!evt) return;
+void sppBLEClass::handle_conn_close(sl_bt_msg_t *evt)
+{
+  if (!evt) {
+    return;
+  }
 
   sl_bt_evt_connection_closed_t *ev_conn = &evt->data.evt_connection_closed;
 
@@ -497,11 +576,16 @@ void sppBLEClass::handle_conn_close(sl_bt_msg_t *evt) {
   }
 }
 
-void sppBLEClass::handle_gatt_data_receive(sl_bt_msg_t *evt) {
-  if (!evt) return;
+void sppBLEClass::handle_gatt_data_receive(sl_bt_msg_t *evt)
+{
+  if (!evt) {
+    return;
+  }
 
-  if (_gatt_db.spp_data_characteristic_handle 
-    != evt->data.evt_gatt_server_attribute_value.attribute) return;
+  if (_gatt_db.spp_data_characteristic_handle
+      != evt->data.evt_gatt_server_attribute_value.attribute) {
+    return;
+  }
 
   log("GATT data received");
 
@@ -531,7 +615,8 @@ void sppBLEClass::handle_gatt_data_receive(sl_bt_msg_t *evt) {
   xSemaphoreGive(_rx_buf_mutex);
 }
 
-void sppBLEClass::handle_ble_event(sl_bt_msg_t *evt) {
+void sppBLEClass::handle_ble_event(sl_bt_msg_t *evt)
+{
   if (user_onbleevent_callback) {
     user_onbleevent_callback(evt);
   }
@@ -559,8 +644,11 @@ void sppBLEClass::handle_ble_event(sl_bt_msg_t *evt) {
   }
 }
 
-void sppBLEClass::begin(const char* ble_name) {
-  if (_state != state::ST_NOT_STARTED) return;
+void sppBLEClass::begin(const char* ble_name)
+{
+  if (_state != state::ST_NOT_STARTED) {
+    return;
+  }
 
   set_ble_name(ble_name);
   init_gattdb();
@@ -574,10 +662,11 @@ void sppBLEClass::begin(const char* ble_name) {
   }
 }
 
-void sppBLEClass::end() {
+void sppBLEClass::end()
+{
   xSemaphoreTake(_tx_buf_mutex, portMAX_DELAY);
   xSemaphoreTake(_rx_buf_mutex, portMAX_DELAY);
-  
+
   stop_advertising();
 
   // Close all connection
@@ -609,7 +698,8 @@ sppBLEClass sppBLE;
  *
  * @param[in] evt Event coming from the Bluetooth stack
  *****************************************************************************/
-void sl_bt_on_event(sl_bt_msg_t* evt) {
+void sl_bt_on_event(sl_bt_msg_t* evt)
+{
   // Pass all the stack events to ezBLE
   sppBLE.handle_ble_event(evt);
 }
