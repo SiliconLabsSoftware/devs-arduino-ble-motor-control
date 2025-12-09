@@ -15,16 +15,16 @@
 // I/O configuration
 #if defined(ARDUINO_BOARD_SILABS_THINGPLUSMATTER)
 #pragma message ( "ARDUINO_BOARD_SILABS_THINGPLUSMATTER" )
-#define PWM_1H     D6
-#define PWM_1L     D7
-#define PWM_2H     D8
-#define PWM_2L     D9
-#define PWM_3H     D10
-#define PWM_3L     D11
-#define PWM_EN     D0
+#define PWM_1H     D4
+#define PWM_1L     D5
+#define PWM_2H     D6
+#define PWM_2L     D7
+#define PWM_3H     D8
+#define PWM_3L     D9
+#define PWM_EN     D10
 #define HALL_A     D3
-#define HALL_B     D4
-#define HALL_C     D5
+#define HALL_B     D0
+#define HALL_C     D11
 #elif defined(ARDUINO_BOARD_NANO_MATTER)
 #pragma message ( "ARDUINO_BOARD_NANO_MATTER" )
 #define PWM_1H     D6
