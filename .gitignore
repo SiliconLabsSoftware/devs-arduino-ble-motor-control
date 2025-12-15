@@ -16,6 +16,7 @@
 **/GNU ARM v*
 **/IAR ARM*
 **/sonar-bw/
+**/.DS_Store
 
 ##Enable these if you are not tracking Simplicity studio project
 # **/.cproject
