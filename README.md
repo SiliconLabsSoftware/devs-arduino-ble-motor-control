@@ -186,6 +186,8 @@ There are multiple ways to build the project.
     1. Modification of the example code is necessary to enable monitoring feature. *(Note: Monitoring decreases the performance)*
     2. [Enable Monitoring](https://docs.simplefoc.com/monitoring)
 
+*Note: If step 3 was successful but nothing appears on the serial monitor the bootloader might be missing. Go to **Tools** and make sure OpenOCD is selected for the **Programmer**. To flash the bootloader use the **Burn Bootloader** option. After the process is done, continue with step 3.*
+
 #### Arduino-CLI
 
 1. (Optional) Setup udev rules to access openocd (Linux)
@@ -197,13 +199,13 @@ There are multiple ways to build the project.
       ```bash
       sudo udevadm control --reload-rules && sudo udevadm trigger
       ```
-2. Program bootloader (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**)
+2. Program bootloader (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**, port: serial port)
    ```bash
-      arduino-cli burn-bootloader -b <target> --programmer openocd
+      arduino-cli burn-bootloader -b <target> -p <port> --programmer openocd
    ```
-3. Upload sketch (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**)
+3. Upload sketch (target: **SiliconLabs:silabs:nano_matter** or **SiliconLabs:silabs:thingplusmatter**, port: serial port)
    ```bash
-       arduino-cli upload -b <target> --build-path "/path/to/build/" --programmer openocd
+       arduino-cli upload -b <target> --build-path "/path/to/build/" -p <port> --programmer openocd
    ```
 
 
