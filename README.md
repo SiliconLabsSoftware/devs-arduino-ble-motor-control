@@ -76,12 +76,12 @@ This table describes the connections between the SparkFun Thing Plus Matter, the
 | `3.3V` | `3V3` | HALL/ENC Supply*  | 3.3V Power; the BoosterPack provides 3.3V through an LDO |
 | `GND`  | `PowerSupply GND` | HALL/ENC sensor GND | Common Ground |
 | N/A    | `PowerSupply 24V` | N/A | Power supply for power stage 4.4 to 45 V, consider motor power|
-| `A0`   | `ISENA` | N/A | Phase A current sense |
-| `A1`   | `ISENB` | N/A | Phase B current sense |
-| `A2`   | `ISENC` | N/A | Phase C current sense |
-| `A3`   | `VSENA` | N/A | Phase A Voltage sense (Optional, not mandatory to run examples) |
-| `A4`   | `VSENB` | N/A | Phase B Voltage sense (Optional, not mandatory to run examples) |
-| `A5`   | `VSENC` | N/A | Phase C Voltage sense (Optional, not mandatory to run examples)|
+| `A0`   | `VSENC` | N/A | Phase C Voltage sense (Optional, not mandatory to run examples) |
+| `A1`   | `VSENB` | N/A | Phase B Voltage sense (Optional, not mandatory to run examples) |
+| `A2`   | `VSENA` | N/A | Phase A Voltage sense (Optional, not mandatory to run examples) |
+| `A3`   | `ISENC` | N/A | Phase C current sense |
+| `A4`   | `ISENB` | N/A | Phase B current sense |
+| `A5`   | `ISENA` | N/A | Phase A current sense |
 | `A6`   | `VSENVPVDD`   | N/A | DC BUS Voltage sense (Optional, not mandatory to run examples)|
 | `A7`   | N/A | N/A | N/A|
 | `A8`   | `nFAULT` | N/A | Fault indicator, specific FAULT status can be obtained through the status registers |
@@ -224,16 +224,16 @@ Commands can be sent via the serial or the BLE interface. The command structures
 #### BLE Connection Setup
 Scan for BLE devices using **Simplicity Connect** application. In the list of detected devices, identify the one named in the format motor_xxyyzz, where xxyyzz corresponds to a portion of the device's Bluetooth address. The figure on the side shows an example of scanning the device we tested. To establish a connection with the device, the user must click the **Connect** button.
 
-![ble_scan](/resources/ble_scan.png)
+![ble_scan](resources/ble_scan.png)
 
 The device details are displayed in the adjacent image. Users may rename the Service and Characteristic fields for easier identification. To begin sending commands, choose the **Write** option. To receive messages from the device, enable the **Notify** option.
 
-![ble_scan](/resources/ble_char.png)
+![ble_scan](resources/ble_char.png)
 
 The image below illustrates the screen after selecting the Write option. At this point, users can input commands, as presented above, to be transmitted to the device for execution.
 *Note: Append the value 0x0A (LF) or 0x0D (CR) at the end of the line to terminate a CLI command.*
 
-![ble_scan](/resources/ble_write.png)
+![ble_scan](resources/ble_write.png)
 
 ---
 
